@@ -11,20 +11,58 @@
 
 const accordionBtns = document.querySelectorAll(".accordion");
 
-accordionBtns.forEach((accordion) => {
-  accordion.onclick = function () {
-    this.classList.toggle("is-open");
+accordionBtns.forEach((accordion, index) => {
+  const content = accordion.nextElementSibling;
 
-    let content = this.nextElementSibling;
-    console.log(content);
+  // Toggle on click or Enter/Space
+  accordion.addEventListener("click", () => toggleAccordion(accordion, content));
 
-    if (content.style.maxHeight) {
-      //this is if the accordion is open
-      content.style.maxHeight = null;
-    } else {
-      //if the accordion is currently closed
-      content.style.maxHeight = content.scrollHeight + "px";
-      console.log(content.style.maxHeight);
+  accordion.addEventListener("keydown", (e) => {
+    const key = e.key;
+
+    switch (key) {
+      case "ArrowDown":
+        e.preventDefault();
+        accordionBtns[(index + 1) % accordionBtns.length].focus();
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        accordionBtns[(index - 1 + accordionBtns.length) % accordionBtns.length].focus();
+        break;
+
+      case "Home":
+        e.preventDefault();
+        accordionBtns[0].focus();
+        break;
+
+      case "End":
+        e.preventDefault();
+        accordionBtns[accordionBtns.length - 1].focus();
+        break;
+
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        toggleAccordion(accordion, content);
+        break;
     }
-  };
+  });
 });
+
+
+function toggleAccordion(button, content) {
+  const expanded = button.getAttribute("aria-expanded") === "true";
+
+  if (expanded) {
+    button.setAttribute("aria-expanded", "false");
+    content.hidden = true;
+    content.style.maxHeight = null;
+  } else {
+    button.setAttribute("aria-expanded", "true");
+    content.hidden = false;
+    content.style.maxHeight = content.scrollHeight + "px";
+  }
+}
+
+
